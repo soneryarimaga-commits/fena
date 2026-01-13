@@ -2,7 +2,8 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Evet Hayır</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sana Bir Sorum Var</title>
 <style>
     body {
         margin: 0;
@@ -13,102 +14,218 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         text-align: center;
+        overflow: hidden;
+    }
+
+    .content-container {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 90%;
+    }
+
+    .gif-container {
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .gif-container img {
+        max-height: 100%;
+        max-width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     h1 {
-        max-width: 90%;
-        margin-bottom: 40px;
-        line-height: 1.4;
-        white-space: pre-line;
+        margin-bottom: 30px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        font-size: 24px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .buttons {
         display: flex;
-        gap: 30px;
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 5;
+        margin-top: 20px;
+        height: 80px;
     }
 
     button {
         border: none;
-        border-radius: 14px;
-        padding: 20px 40px;
-        font-size: 22px;
+        border-radius: 50px;
+        padding: 15px 30px;
+        font-size: 20px;
+        font-weight: bold;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        white-space: nowrap;
     }
 
     #evet {
         background: #2ecc71;
-        color: #000;
+        color: #fff;
     }
 
     #hayir {
         background: #e74c3c;
         color: #fff;
     }
+
+    /* UYARI MESAJI (TOAST) STİLİ */
+    #toast {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+        padding: 16px;
+        position: fixed;
+        z-index: 100;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 18px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        border: 1px solid #e74c3c;
+    }
+
+    #toast.show {
+        visibility: visible;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+    }
+
 </style>
 </head>
 <body>
 
-<h1 id="sentence"></h1>
+<div class="content-container">
+    <div class="gif-container">
+        <img id="currentGif" src="" alt="Gif">
+    </div>
+    <h1 id="sentence"></h1>
+</div>
 
 <div class="buttons">
     <button id="evet">Evet</button>
     <button id="hayir">Hayır</button>
 </div>
 
+<div id="toast">Hayır'ı dene bence... 😈</div>
+
 <script>
-const sentences = [
-    "Artık sinirli değilsin bana galiba",
-    "Bütlere kalacaksın demi",
-    "Canını sıkan bir şey var mı",
-    "Takip isteğini kabul edeceksin gibi geldi",
-    "Finaller de bittiğine göre bakarsın artık mesajlara\n\nDur daha iyi bir fikrim var\nBana güveniyor musun?"
+const data = [
+    {
+        text: "Artık sinirli değilsin bana galiba? 🥺",
+        gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZ3bmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHByJmN0PWc/7SF5scGB2AFrO/giphy.gif"
+    },
+    {
+        text: "Bütlere kalacaksın demi? 😅",
+        gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHByJmN0PWc/13Cmju387AX0o/giphy.gif"
+    },
+    {
+        text: "Canını sıkan bir şey var mı? Anlat dinliyorum... 🤔",
+        gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHByJmN0PWc/tB8Wl0JvR0f7i/giphy.gif"
+    },
+    {
+        text: "Takip isteğini kabul edeceksin gibi geldi ✨",
+        gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHByJmN0PWc/oFDSGhLADrqRm/giphy.gif"
+    },
+    {
+        // FİNAL SORUSU
+        text: "Finaller de bittiğine göre bakarsın artık mesajlara...\n\nDur daha iyi bir fikrim var.\nBana güveniyor musun? ❤️",
+        gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHBybmZ4NjR3eHByJmN0PWc/KzM1lAfJjCW3S3pCHC/giphy.gif"
+    }
 ];
 
 let index = 0;
-let hayirClick = 0;
-let evetScale = 1;
-let hayirScale = 1;
+let evetScale = 1.0;
+let hayirScale = 1.0;
 
 const sentenceEl = document.getElementById("sentence");
+const gifEl = document.getElementById("currentGif");
 const evetBtn = document.getElementById("evet");
 const hayirBtn = document.getElementById("hayir");
+const toast = document.getElementById("toast");
 
-sentenceEl.innerText = sentences[index];
+function showToastMessage() {
+    toast.className = "show";
+    setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+}
 
-function nextSentence() {
-    if (index < sentences.length - 1) {
-        index++;
-        sentenceEl.innerText = sentences[index];
+function updateView() {
+    if (index >= data.length) index = data.length - 1;
+
+    sentenceEl.innerText = data[index].text;
+    gifEl.src = data[index].gif;
+
+    // Eğer son soruya geldiysek
+    if (index === data.length - 1) {
+        hayirBtn.style.display = "none"; 
+        evetBtn.innerText = "Evet, Güveniyorum! 💖";
     }
 }
 
-hayirBtn.onclick = () => {
-    hayirClick++;
+updateView();
 
-    evetScale *= 1.6;
-    hayirScale *= 0.6;
+// --- BUTON OLAYLARI ---
+
+// HAYIR BUTONU: İlerlemeyi sağlar ve Evet butonunu büyütür
+hayirBtn.addEventListener('click', () => {
+    if (index < data.length - 1) {
+        index++;
+    }
+
+    // Orantılı büyüme/küçülme
+    evetScale += 0.4;
+    hayirScale = Math.max(0.1, hayirScale - 0.2);
 
     evetBtn.style.transform = `scale(${evetScale})`;
     hayirBtn.style.transform = `scale(${hayirScale})`;
 
-    nextSentence();
+    updateView();
+});
 
-    if (hayirClick === 4) {
-        hayirBtn.style.display = "none";
-    }
-
-    if (hayirClick === 5) {
-        const message = encodeURIComponent("bir sonrakine çorbayı içmek istiyorum");
+// EVET BUTONU: Tuzaklı yapı
+evetBtn.addEventListener('click', () => {
+    // 1. Durum: SON SORUDAYSAK (WhatsApp'a git)
+    if (index === data.length - 1) {
+        const message = encodeURIComponent("Bana güvenmene sevindim! O zaman bir sonrakine çorbayı içiyoruz? 🥣🥰");
         window.location.href = `https://wa.me/905350782617?text=${message}`;
+    } 
+    // 2. Durum: Diğer sorulardaysak (BLOKE ET VE UYARI VER)
+    else {
+        showToastMessage();
     }
-};
+});
 
-evetBtn.onclick = () => {
-    nextSentence();
-};
 </script>
 
 </body>
