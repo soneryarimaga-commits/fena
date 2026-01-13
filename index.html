@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Evet Hayır</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: #111;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+
+    h1 {
+        max-width: 90%;
+        margin-bottom: 40px;
+        line-height: 1.4;
+        white-space: pre-line;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 30px;
+    }
+
+    button {
+        border: none;
+        border-radius: 14px;
+        padding: 20px 40px;
+        font-size: 22px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    #evet {
+        background: #2ecc71;
+        color: #000;
+    }
+
+    #hayir {
+        background: #e74c3c;
+        color: #fff;
+    }
+</style>
+</head>
+<body>
+
+<h1 id="sentence"></h1>
+
+<div class="buttons">
+    <button id="evet">Evet</button>
+    <button id="hayir">Hayır</button>
+</div>
+
+<script>
+const sentences = [
+    "Artık sinirli değilsin bana galiba",
+    "Bütlere kalacaksın demi",
+    "Canını sıkan bir şey var mı",
+    "Takip isteğini kabul edeceksin gibi geldi",
+    "Finaller de bittiğine göre bakarsın artık mesajlara\n\nDur daha iyi bir fikrim var\nBana güveniyor musun?"
+];
+
+let index = 0;
+let hayirClick = 0;
+let evetScale = 1;
+let hayirScale = 1;
+
+const sentenceEl = document.getElementById("sentence");
+const evetBtn = document.getElementById("evet");
+const hayirBtn = document.getElementById("hayir");
+
+sentenceEl.innerText = sentences[index];
+
+function nextSentence() {
+    if (index < sentences.length - 1) {
+        index++;
+        sentenceEl.innerText = sentences[index];
+    }
+}
+
+hayirBtn.onclick = () => {
+    hayirClick++;
+
+    evetScale *= 1.6;
+    hayirScale *= 0.6;
+
+    evetBtn.style.transform = `scale(${evetScale})`;
+    hayirBtn.style.transform = `scale(${hayirScale})`;
+
+    nextSentence();
+
+    if (hayirClick === 4) {
+        hayirBtn.style.display = "none";
+    }
+
+    if (hayirClick === 5) {
+        const message = encodeURIComponent("bir sonrakine çorbayı içmek istiyorum");
+        window.location.href = `https://wa.me/905350782617?text=${message}`;
+    }
+};
+
+evetBtn.onclick = () => {
+    nextSentence();
+};
+</script>
+
+</body>
+</html>
